@@ -15,12 +15,29 @@
 */
 package org.milyn.routing.basic;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import javax.xml.XMLConstants;
+
+import org.milyn.SmooksException;
+import org.milyn.cdr.annotation.ConfigParam;
+import org.milyn.container.ExecutionContext;
 import org.milyn.delivery.Fragment;
 import org.milyn.delivery.VisitLifecycleCleanable;
 import org.milyn.delivery.dom.DOMVisitAfter;
 import org.milyn.delivery.dom.DOMVisitBefore;
 import org.milyn.delivery.ordering.Producer;
-import org.milyn.delivery.sax.*;
+import org.milyn.delivery.sax.DynamicSAXElementVisitorList;
+import org.milyn.delivery.sax.SAXElement;
+import org.milyn.delivery.sax.SAXElementVisitor;
+import org.milyn.delivery.sax.SAXElementWriterUtil;
+import org.milyn.delivery.sax.SAXText;
+import org.milyn.delivery.sax.SAXVisitAfter;
+import org.milyn.delivery.sax.SAXVisitBefore;
 import org.milyn.javabean.context.BeanContext;
 import org.milyn.javabean.lifecycle.BeanContextLifecycleEvent;
 import org.milyn.javabean.lifecycle.BeanLifecycle;
@@ -29,21 +46,9 @@ import org.milyn.namespace.NamespaceDeclarationStack;
 import org.milyn.util.CollectionsUtil;
 import org.milyn.xml.NamespaceMappings;
 import org.milyn.xml.XmlUtil;
-import org.milyn.container.ExecutionContext;
-import org.milyn.SmooksException;
-import org.milyn.cdr.annotation.ConfigParam;
 import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.XMLConstants;
 
 /**
  * Basic message fragment serializer.
@@ -254,6 +259,15 @@ public class FragmentSerializer implements SAXVisitBefore, SAXVisitAfter, DOMVis
 					// Already declared (on the element)...
 					return;
 				}
+			}
+            
+            int index=0;
+			while(index <= element.getAttributes().getLength()){
+					if (element.getAttributes().getValue(index) !=null && element.getAttributes().getValue(index).equals(namespaceURI)) {
+					//Already declared (on the element)...
+					return;
+				}
+				index++;
 			}
 			
 			Attributes attributes = element.getAttributes();
